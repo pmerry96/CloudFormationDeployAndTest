@@ -26,10 +26,11 @@ my @regions=("us-west-2", "eu-west-1", "ap-southeast-1", "ca-central-1");
 
 foreach my $reg (@regions)
 {
-	my $parmpath = `./add_regions.pl -r $reg -p $pass -k $key -u $url`;
+	chomp(my $parmpath = `./create_parameters.pl -r $reg -p $pass -k $key -u $url`);
 	my $awscmd="aws cloudformation create-stack --region $reg --stack-name SPSL-QuickStart-CLI-Test-$reg --template-url $url --parameters file://./$parmpath --capabilities CAPABILITY_IAM --on-failure DO_NOTHING";
 	if( ${opt_a} ){
-		`$awscmd`		
+		my $output=`$awscmd`;
+		print "AWS CLI Command \"$awscmd\" gave output:\n$output\n";
 	}else{
 		print "$awscmd\n";
 	}
