@@ -1,0 +1,24 @@
+[
+{
+    "ParameterKey": "SIOSAMIType",
+    "ParameterValue": "PAYG"
+},
+{
+    "ParameterKey": "PrivateSubnet2CIDR",
+    "ParameterValue": "10.0.32.0/19"
+},
+{
+    "ParameterKey": "HomeVolumeType",
+    "ParameterValue": "General Purpose (SSD)"
+},
+{
+    "ParameterKey": "SPSLInstanceNamePrefix",
+    "ParameterValue": "SPSL"
+},
+{
+    "ParameterKey": "Node1PrivateIP",
+    "ParameterValue": "10.0.0.100"
+},
+{
+    "ParameterKey": "QSS3KeyPrefix",
+    "ParameterValue": "

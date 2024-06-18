@@ -1,0 +1,41 @@
+"
+},
+{
+    "ParameterKey": "MirrorSize",
+    "ParameterValue": "100"
+},
+{
+    "ParameterKey": "NumBastionHosts",
+    "ParameterValue": "1"
+},
+{
+    "ParameterKey": "HomeIops",
+    "ParameterValue": "1000"
+},
+{
+    "ParameterKey": "MirrorVolumeType",
+    "ParameterValue": "General Purpose (SSD)"
+},
+{
+    "ParameterKey": "HomeDeleteOnTermination",
+    "ParameterValue": "true"
+},
+{
+    "ParameterKey": "VPCCIDR",
+    "ParameterValue": "10.0.0.0/16"
+},
+{
+    "ParameterKey": "PublicSubnet1CIDR",
+    "ParameterValue": "10.0.128.0/20"
+},
+{
+    "ParameterKey": "MirrorIops",
+    "ParameterValue": "1000"
+},
+{
+    "ParameterKey": "Node2PrivateIP",
+    "ParameterValue": "10.0.32.100"
+},
+{
+    "ParameterKey": "KeyPairName",
+    "ParameterValue": "

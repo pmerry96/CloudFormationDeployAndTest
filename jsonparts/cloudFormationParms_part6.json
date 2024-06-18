@@ -1,0 +1,11 @@
+"
+},
+{
+    "ParameterKey": "SPSLInstanceType",
+    "ParameterValue": "t2.medium"
+},
+{
+    "ParameterKey": "HomeSize",
+    "ParameterValue": "100"
+}
+]
