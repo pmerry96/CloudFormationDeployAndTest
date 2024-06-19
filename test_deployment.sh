@@ -1,22 +1,21 @@
 #!/bin/bash
 
 echo "INSTALLED PACKAGES SPSL01"
-echo "rpm -qa | grep steeleye-lk | sed 's/^/    /'" | ssh -o "StrictHostKeyChecking no" -i AUTOMATION.pem 10.0.0.100
+ssh -o "StrictHostKeyChecking no" -i $1 10.0.0.100 -f "sudo rpm -qa | grep steeleye-lk | sed 's/^/    /'" 
 
 echo "CURRENT HIERARCHY SPSL01"
-echo "lcdstatus -q | sed 's/^/    /'" | ssh -o "StrictHostKeyChecking no"-i AUTOMATION.pem 10.0.0.100
+ssh -o "StrictHostKeyChecking no" -i $1 10.0.0.100 -f "sudo /opt/LifeKeeper/bin/lcdstatus -q | sed 's/^/    /'"
 
 echo "EQUIVALENCIES SPSL01"
-echo "eqv_list | sed 's/^/    /'" | ssh -o "StrictHostKeyChecking no" -i AUTOMATION.pem 10.0.0.100
+ssh -o "StrictHostKeyChecking no" -i $1 10.0.0.100 -f "sudo /opt/LifeKeeper/bin/eqv_list | sed 's/^/    /'"
 
 echo "INSTALLED PACKAGES SPSL02"
-echo "rpm -qa | grep steeleye-lk | sed 's/^/    /'" | ssh -o "StrictHostKeyChecking no" -i AUTOMATION.pem 10.0.32.100
+ssh -o "StrictHostKeyChecking no" -i $1 10.0.32.100 -f "sudo rpm -qa | grep steeleye-lk | sed 's/^/    /'"
 
 echo "CURRENT HIERARCHY SPSL02"
-echo "lcdstatus -q | sed 's/^/    /'" | ssh -o "StrictHostKeyChecking no" -i AUTOMATION.pem 10.0.32.100
+ssh -o "StrictHostKeyChecking no" -i $1 10.0.32.100 -f "sudo /opt/LifeKeeper/bin/lcdstatus -q | sed 's/^/    /'"
 
 echo "EQUIVALENCIES SPSL02"
-echo "eqv_list | sed 's/^/    /'" | ssh -o "StrictHostKeyChecking no" -i AUTOMATION.pem 10.0.32.100
+ssh -o "StrictHostKeyChecking no" -i $1 10.0.32.100 -f "sudo /opt/LifeKeeper/bin/eqv_list | sed 's/^/    /'"
 
-
-exit 0;
+exit 0
