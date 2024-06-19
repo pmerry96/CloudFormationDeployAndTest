@@ -125,7 +125,8 @@ if( -e $key.".pem"){
 		if( defined $pubIP && $pubIP ne "" && $pubIP =~ m/\\d+\\.\\d+\\.\\d+\\.\\d+/){
 			my $pinger = Net::Ping->new();
 			if( $p->ping($pubIP) ){
-				my @results = split(/\n/, `cat ./test_deployment.sh | ssh -i $accesskey ec2-user\@$pubIP '/bin/bash'`);
+				`scp -o "StrictHostKeyChecking no" -i $accesskey $accesskey $pubIP:~/ 2>&1 > /dev/null`;
+				my @results = split(/\n/, `cat ./test_deployment.sh | ssh -o "StrictHostKeyChecking no" -i $accesskey ec2-user\@$pubIP '/bin/bash'`);
 				foreach my $testline (@results){
 					print "\t$testline\n";
 				}
