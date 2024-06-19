@@ -13,6 +13,7 @@ getopts("p:k:u:n:awdt");
 # 	-p: Password for the instances
 # 	-k: key file name for the instances (without the .<extension> on the file name)
 # 	-u: URL for the template file, in an s3 bucket
+#	-a: (optional) "Active". When specified, the script will actually create resources. 
 # 	-n: (optional) the number of deployments to make, IE number of tests
 # 	-w: (optional) wait for completion, script will loop until all stacks are either completed or failed. 
 # 	-d: (optional) delete on completion. set -d to delete resources after script completes. Also deletes stacks on failure
@@ -74,8 +75,13 @@ foreach my $reg (@regions_to_test)
 	$awscmd="aws cloudformation create-stack --region $reg --stack-name SPSL-QuickStart-CLI-Test3-$reg --template-url $url --parameters file://./$parmpath --capabilities CAPABILITY_IAM --on-failure DO_NOTHING";
 	if( ${opt_a} ){
 		chomp($output=`$awscmd`);
-		$arns{$reg}=$output;
-		print "AWS CLI Command \"$awscmd\" gave output:\n$output\n";
+		if($? != 0){
+			$arns{$reg}=$output;
+			print "AWS CLI Command \"$awscmd\" gave output:\n$output\n";
+		}else{
+			print "Stack failed to deploy with command \"$awscmd\", gave output:\n\"$output\"";
+			$output="";
+		}
 	}else{
 		$output="";
 		print "$awscmd\n";
