@@ -92,13 +92,13 @@ foreach my $jsonpartfile (@jsonpartfiles)
 
 my @parameters = split(/\n/, $jsonparts[0].$s3object.$jsonparts[1].$key.$jsonparts[2].$s3bucket.$jsonparts[3].$azstr.$jsonparts[4].$pass.$jsonparts[5].$s3region.$jsonparts[6]);
 
-`mkdir -p $region`;
+`mkdir -p ./generated-templates/$region`;
 if ( $? != 0 )
 {
 	print STDERR "Could not mkdir $region. Aborting.\n";
 	exit 1;
 }
-my $outfile = "./$region/cloudFormationParms.$region.json";
+my $outfile = "./generated-templates/$region/cloudFormationParms.$region.json";
 
 if( -e "$outfile")
 {
