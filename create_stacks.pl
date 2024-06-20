@@ -57,13 +57,14 @@ my $key = ${opt_k};
 
 my $onfailure = ( $delete_on_complete && ! $waitforcompleted) ? "DELETE" : "DO_NOTHING";
 
-my @regions=("ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ca-central-1", "eu-central-1", "eu-north-1", "eu-west-1", "eu-west-2", "eu-west-3", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2");
+#my @regions=("ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ca-central-1", "eu-central-1", "eu-north-1", "eu-west-1", "eu-west-2", "eu-west-3", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2");
 
-#my @regions=("us-west-2");
+my @regions=("us-west-2");
 
 # if more tests than regions, only test once for each region. 
 if($num_tests > scalar @regions){
 	my $max = scalar @regions;
+	$num_tests=$max;
 	print "Number of tests greater than number of regions, using $max tests instead\n";
 }
 
@@ -142,7 +143,9 @@ print "ALL STACKS DEPLOYMENT COMPLETED\n";
 
 
 # Begin testing the stacks
-print "\n\nBEGINNING TEST OF STACKS\n\n";
+print "##############################\n";
+print "###BEGINNING TEST OF STACKS###\n";
+print "##############################\n";
 if( -e $key.".pem"){
 	# Build name of the access key, it must be in the repo directory to use
 	my $accesskey = $key.".pem";
@@ -151,30 +154,59 @@ if( -e $key.".pem"){
 		# get bastion host IP with this heinous AWS CLI command
 		chomp(my $pubIP=`aws ec2 describe-instances --region $region --filters "Name=\"tag:cloudformation:stack-id\",Values=\"$arns{$region}\"" "Name=\"tag:aws:cloudformation:logical-id\",Values=\"BastionAutoScalingGroup\"" --query "Reservations[*].Instances[*].PublicIPAddress"`);
 		
+		my @resultsnode1 = ();
+		my @resultsnode2 = ();;
 		# If we have an IP and it is non-empty and it matches an IP, then continue testing
 		if( defined $pubIP && $pubIP ne "" && $pubIP =~ m/\\d+\\.\\d+\\.\\d+\\.\\d+/){
 
 			# Make a pinger and ping the system by the public IP
 			my $pinger = Net::Ping->new();
-			if( $p->ping($pubIP) ){
+			if( $pinger->ping($pubIP) ){
+				
+				# Put the necessary resources on the bastion host
 				# If we could reach the system, send the access key to it and run the test script
 				`scp -o "StrictHostKeyChecking no" -i $accesskey $accesskey ec2-user\@$pubIP:~/ 2>&1 > /dev/null`;
 				`scp -o "StrictHostKeyChecking no" -i $accesskey test_deployment.sh ec2-user\@$pubIP:~/ 2>&1 > /dev/null`;
-				#run test script and print results
-				my @results = split(/\n/, `ssh -o "StrictHostKeyChecking no" -i $accesskey ec2-user\@$pubIP -fq 'chmod 700 ~/test_deployment.sh; ~/test_deployment.sh $accesskey'`);
-				foreach my $testline (@results){
-					print "\t$testline\n";
+				
+				
+				# Run the tests on the cluster nodes and save results to put in a file
+				my @resultsnode1 = split(/\n/, `ssh -o "StrictHostKeyChecking no" -i $accesskey ec2-user\@$pubIP -fq 'chmod 700 ~/test_deployment.sh; ~/test_deployment.sh $accesskey 10.0.0.100'`);
+				my @resultsnode2 = split(/\n/, `ssh -o "StrictHostKeyChecking no" -i $accesskey ec2-user\@$pubIP -fq 'chmod 700 ~/test_deployment.sh; ~/test_deployment.sh $accesskey 10.0.32.100'`);
+				
+				
+				# Output to the files specified, deleting old tests. 
+				my $testoutput="./test-results/$region/SPSL01.txt";
+				if( -e $testoutput ) {
+					unlink $testoutput;
 				}
+				open(FH, '>', $testoutput) or (print STDERR "COULD NOT OPEN TEST OUTPUT FILE $testoutput - \"$!\"\n" and next);
+				foreach my $node1line (@resultsnode1){
+					print FH "$node1line\n";
+				}
+				close(FH);
+				$testoutput="./test-results/$region/SPSL02.txt";
+				if ( -e $testoutput ) {
+					unlink $testoutput;
+				}
+				open(FH, '>', $testoutput) or (print STDERR "COULD NOT OPEN TEST OUTPUT FILE $testoutput\n - \"$!\"" and next);
+				foreach my $node2line (@resultsnode2){
+					print FH "$node2line\n";
+				}
+				close(FH);
 			}
 		}
 		print "END TEST OF STACK IN $region\n";
-		print "\n\n\n\n\n";
 		sleep 5;
 	}
 }
 
 # If set to delete on completion, fire off the deletes
+
+print "\n";
 if($delete_on_complete){
+	print "########################################\n";
+	print "###BEGINNING DELETE OF CREATED STACKS###\n";
+	print "########################################\n\n";
 	foreach my $region (keys %arns){
 		print "DELETING STACK $arns{$region} in $region\n";
 		`aws cloudformation delete-stack --region $region --stack-name $arns{$region}`;
@@ -194,13 +226,14 @@ if($delete_on_complete){
 
 print "All stacks queued for deletion\n";
 
-
 %arns_to_check=%arns;
+my $printedonce = 0;
 while (scalar keys %arns_to_check){
-	if(!$wait_on_termination){
+	if(!$wait_on_termination || !$delete_on_complete ){
 		last;
 	}else{
-		print "Wait on Stack deletion\n"
+		print "Wait on Stack deletion\n" unless $printedonce;
+		$printedonce++;
 	}
         foreach my $region (keys %arns_to_check){
                 #check the status of the stack
