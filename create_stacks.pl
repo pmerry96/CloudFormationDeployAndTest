@@ -245,7 +245,7 @@ while (scalar keys %arns_to_check){
 	}
         foreach my $region (keys %arns_to_check){
                 #check the status of the stack
-                chomp(my $status = `aws cloudformation describe-stacks --region $region --output text --stack-name $arn{$region} --query "Stacks[*].StackStatus`);
+                chomp(my $status = `aws cloudformation describe-stacks --region $region --output text --stack-name $arn{$region} --query "Stacks[*].StackStatus"`);
                 if( $status eq "DELETE_COMPLETE"){
                         print "Stack $arns_to_check{$region} in region $region got SUCCESSFULLY DELETED with status $status\n";
        	                delete $arns_to_check{$region};
