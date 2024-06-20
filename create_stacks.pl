@@ -57,9 +57,9 @@ my $key = ${opt_k};
 
 my $onfailure = ( $delete_on_complete && ! $waitforcompleted) ? "DELETE" : "DO_NOTHING";
 
-#my @regions=("ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ca-central-1", "eu-central-1", "eu-north-1", "eu-west-1", "eu-west-2", "eu-west-3", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2");
+my @regions=("ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ca-central-1", "eu-central-1", "eu-north-1", "eu-west-1", "eu-west-2", "eu-west-3", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2");
 
-my @regions=("us-west-2");
+#my @regions=("us-west-2");
 
 # if more tests than regions, only test once for each region. 
 if($num_tests > scalar @regions){
@@ -87,9 +87,7 @@ foreach my $reg (@regions_to_test)
 	chomp(my $parmpath = `./create_parameters.pl -r $reg -p $pass -k $key -u $url`);
 	$awscmd="aws cloudformation create-stack --region $reg --stack-name SPSL-QuickStart-CLI-Test-$reg --template-url $url --parameters file://$parmpath --capabilities CAPABILITY_IAM --on-failure $onfailure";
 	if( ${opt_a} ){
-		#chomp($output=`$awscmd`);
-		$output="arn:aws:cloudformation:us-west-2:377444680806:stack/SPSL-QuickStart-CLI-Test-us-west-2/abe72cb0-2f2e-11ef-bbfe-0a592c86c06b";
-		`sleep 1`;
+		chomp($output=`$awscmd`);
 		if($? == 0){
 			$arns{$reg}=$output;
 			print "AWS CLI Command \"$awscmd\" gave output:\n$output\n";
