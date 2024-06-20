@@ -85,7 +85,7 @@ if (! ${opt_a} ){
 foreach my $reg (@regions_to_test)
 {
 	chomp(my $parmpath = `./create_parameters.old.pl -r $reg -p $pass -k $key -u $url`);
-	$awscmd="aws cloudformation create-stack --region $reg --stack-name SPSL-QuickStart-CLI-Test2-$reg --template-url $url --parameters file://$parmpath --capabilities CAPABILITY_IAM --on-failure $onfailure";
+	$awscmd="aws cloudformation create-stack --region $reg --stack-name SPSL-QuickStart-CLI-Test-$reg --template-url $url --parameters file://$parmpath --capabilities CAPABILITY_IAM --on-failure $onfailure";
 	if( ${opt_a} ){
 		chomp($output=`$awscmd`);
 		if($? == 0){
@@ -177,8 +177,8 @@ if( -e $key.".pem"){
 				
 				
 				# Run the tests on the cluster nodes and save results to put in a file
-				my @resultsnode1 = split(/\n/, `ssh -o "StrictHostKeyChecking no" -i $accesskey ec2-user\@$pubIP -fq 'chmod 700 ~/test_deployment.sh; ~/test_deployment.sh $accesskey 10.0.0.100'`);
-				my @resultsnode2 = split(/\n/, `ssh -o "StrictHostKeyChecking no" -i $accesskey ec2-user\@$pubIP -fq 'chmod 700 ~/test_deployment.sh; ~/test_deployment.sh $accesskey 10.0.32.100'`);
+				my @resultsnode1 = split(/\n/, `ssh -o "StrictHostKeyChecking no" -i $accesskey ec2-user\@$pubIP -q 'chmod 700 ~/test_deployment.sh; sudo ~/test_deployment.sh $accesskey 10.0.0.100'`);
+				my @resultsnode2 = split(/\n/, `ssh -o "StrictHostKeyChecking no" -i $accesskey ec2-user\@$pubIP -q 'chmod 700 ~/test_deployment.sh; sudo ~/test_deployment.sh $accesskey 10.0.32.100'`);
 				
 				
 				# Output to the files specified, deleting old tests. 
