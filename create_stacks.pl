@@ -59,6 +59,8 @@ my $onfailure = ( $delete_on_complete && ! $waitforcompleted) ? "DELETE" : "DO_N
 
 my @regions=("ap-northeast-2", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ca-central-1", "eu-central-1", "eu-north-1", "eu-west-1", "eu-west-2", "eu-west-3", "sa-east-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2");
 
+#my @regions=("us-west-2");
+
 # if more tests than regions, only test once for each region. 
 if($num_tests > scalar @regions){
 	my $max = scalar @regions;
@@ -75,14 +77,14 @@ my $awscmd ="";
 foreach my $reg (@regions_to_test)
 {
 	chomp(my $parmpath = `./create_parameters.pl -r $reg -p $pass -k $key -u $url`);
-	$awscmd="aws cloudformation create-stack --region $reg --stack-name SPSL-QuickStart-CLI-Test3-$reg --template-url $url --parameters file://./$parmpath --capabilities CAPABILITY_IAM --on-failure $onfailure";
+	$awscmd="aws cloudformation create-stack --region $reg --stack-name SPSL-QuickStart-CLI-Test2-$reg --template-url $url --parameters file://./$parmpath --capabilities CAPABILITY_IAM --on-failure $onfailure";
 	if( ${opt_a} ){
 		chomp($output=`$awscmd`);
-		if($? != 0){
+		if($? == 0){
 			$arns{$reg}=$output;
 			print "AWS CLI Command \"$awscmd\" gave output:\n$output\n";
 		}else{
-			print "Stack failed to deploy with command \"$awscmd\", gave output:\n\"$output\"";
+			print "Stack failed to deploy with command \"$awscmd\", gave output:\n\"$output\"\n";
 			$output="";
 		}
 	}else{
@@ -90,7 +92,7 @@ foreach my $reg (@regions_to_test)
 		print "$awscmd\n";
 	}
 	# If we got an ARN back from the AWS CLI, store it in a hash for later
-	if( $waitforcompleted && $output ne "" && $output =~ m/^arn:aws:cloudformation/){
+	if( $waitforcompleted && $output ne "" ){ # && $output =~ m/^arn:aws:cloudformation/){
 		$arns{$reg}="$output";	
 	}
 }
@@ -116,7 +118,7 @@ while (scalar keys %arns_to_check){
 
 		# If stack status is complete, remove it from list to check and print success
 		if( $status =~ m/_COMPLETE$/ && $status ne "DELETE_COMPLETE"){
-			print "Stack $arns_to_check{$region} in region $region got SUCCESSFUL status $status";
+			print "Stack $arns_to_check{$region} in region $region got SUCCESSFUL status $status\n";
 			delete $arns_to_check{$region};
 		# If stack status is failed, delete the stack if delete on complete is set and remove it from list of all arns and list of arns to check. 
 		}elsif($status =~ m/_FAILED$/){
@@ -132,6 +134,7 @@ while (scalar keys %arns_to_check){
 			delete $arns_to_check{$region};
 			delete $arns{$region};
 		}
+	sleep 5;
 	}
 }
 
@@ -155,10 +158,10 @@ if( -e $key.".pem"){
 			my $pinger = Net::Ping->new();
 			if( $p->ping($pubIP) ){
 				# If we could reach the system, send the access key to it and run the test script
-				`scp -o "StrictHostKeyChecking no" -i $accesskey $accesskey $pubIP:~/ 2>&1 > /dev/null`;
-				`scp -o "StrictHostKeyChecking no" -i $accesskey test_deployment.sh $pubIP:~/ 2>&1 > /dev/null`;
+				`scp -o "StrictHostKeyChecking no" -i $accesskey $accesskey ec2-user\@$pubIP:~/ 2>&1 > /dev/null`;
+				`scp -o "StrictHostKeyChecking no" -i $accesskey test_deployment.sh ec2-user\@$pubIP:~/ 2>&1 > /dev/null`;
 				#run test script and print results
-				my @results = split(/\n/, `ssh -o "StrictHostKeyChecking no" -i $accesskey ec2-user\@$pubIP -f 'chmod 700 ~/test_deployment.sh; ~/test_deployment.sh $accesskey'`);
+				my @results = split(/\n/, `ssh -o "StrictHostKeyChecking no" -i $accesskey ec2-user\@$pubIP -fq 'chmod 700 ~/test_deployment.sh; ~/test_deployment.sh $accesskey'`);
 				foreach my $testline (@results){
 					print "\t$testline\n";
 				}
@@ -166,14 +169,24 @@ if( -e $key.".pem"){
 		}
 		print "END TEST OF STACK IN $region\n";
 		print "\n\n\n\n\n";
+		sleep 5;
 	}
 }
 
 # If set to delete on completion, fire off the deletes
-if($delete_on_completion){
+if($delete_on_complete){
 	foreach my $region (keys %arns){
 		print "DELETING STACK $arns{$region} in $region\n";
 		`aws cloudformation delete-stack --region $region --stack-name $arns{$region}`;
+		my $ret = $?;
+		my $retry = 3;
+		# If aforementioned failed, retry
+		while ( $ret != 0 && $retry > 0){
+			`aws cloudformation delete-stack --region $region --stack-name $arns{$region}`;
+			$ret = $?;
+			$retry--;
+			sleep 5; 
+		}
 	}
 }else{
 	exit 0;
@@ -193,13 +206,14 @@ while (scalar keys %arns_to_check){
                 #check the status of the stack
                 chomp(my $status = `aws cloudformation describe-stacks --region $region --output text --stack-name $arn{$region} --query "Stacks[*].StackStatus`);
                 if( $status eq "DELETE_COMPLETE"){
-                        print "Stack $arns_to_check{$region} in region $region got SUCCESSFULLY DELETED with status $status";
+                        print "Stack $arns_to_check{$region} in region $region got SUCCESSFULLY DELETED with status $status\n";
        	                delete $arns_to_check{$region};
                 }elsif($status =~ m/_FAILED$/){
        	                print STDERR "STACK $arns{$region} got FAILED status $status.\n";
        	                delete $arns_to_check{$region};
        	        }
-       	}
+       		sleep 5;
+	}
 }
 
 
