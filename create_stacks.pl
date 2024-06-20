@@ -159,13 +159,11 @@ if( -e $key.".pem"){
 	foreach my $region (keys %arns){
 		print "PERFORMING TEST OF STACK IN $region\n";
 		# get bastion host IP with this heinous AWS CLI command
-		chomp(my $pubIP=`aws ec2 describe-instances --region $region --filters "Name=\"tag:cloudformation:stack-id\",Values=\"$arns{$region}\"" "Name=\"tag:aws:cloudformation:logical-id\",Values=\"BastionAutoScalingGroup\"" --query "Reservations[*].Instances[*].PublicIPAddress"`);
-		
+		chomp(my $pubIP=` aws ec2 describe-instances --region $region --output text --filters "Name=\"tag:Name\",Values=\"LinuxBastion\"" "Name=\"tag:aws:cloudformation:logical-id\",Values=\"BastionAutoScalingGroup\"" --query "Reservations[*].Instances[*].PublicIpAddress"`);
 		my @resultsnode1 = ();
 		my @resultsnode2 = ();;
 		# If we have an IP and it is non-empty and it matches an IP, then continue testing
-		if( defined $pubIP && $pubIP ne "" && $pubIP =~ m/\\d+\\.\\d+\\.\\d+\\.\\d+/){
-
+		if( defined $pubIP && $pubIP ne "" ){ # && $pubIP =~ m/\\d+\\.\\d+\\.\\d+\\.\\d+/){
 			# Make a pinger and ping the system by the public IP
 			my $pinger = Net::Ping->new();
 			if( $pinger->ping($pubIP) ){
