@@ -84,7 +84,7 @@ if (! ${opt_a} ){
 
 foreach my $reg (@regions_to_test)
 {
-	chomp(my $parmpath = `./create_parameters.pl -r $reg -p $pass -k $key -u $url`);
+	chomp(my $parmpath = `./create_parameters.old.pl -r $reg -p $pass -k $key -u $url`);
 	$awscmd="aws cloudformation create-stack --region $reg --stack-name SPSL-QuickStart-CLI-Test2-$reg --template-url $url --parameters file://$parmpath --capabilities CAPABILITY_IAM --on-failure $onfailure";
 	if( ${opt_a} ){
 		chomp($output=`$awscmd`);

@@ -1,1 +1,6 @@
 # Required options for the update, creation, and deployment of cloudformation template for SPS-L
+
+S3URL=""
+S3URI=""
+KEY=""
+PASSWORD=""
