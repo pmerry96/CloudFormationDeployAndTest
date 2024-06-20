@@ -1,6 +1,5 @@
 # Required options for the update, creation, and deployment of cloudformation template for SPS-L
-
-S3URL=""
-S3URI=""
-KEY=""
-PASSWORD=""
+S3URL=https://NOTABUCKET.s3.NOTAREGION.amazonaws.com/NOTADIR/templates/sios-protection-suite-main.template.yaml
+S3URI=s3://NOTABUCKET/NOTADIR/
+KEYPAIRNAME=NOTAREALKEYNAME
+NEWROOTPASSWORD=NOTAPASS

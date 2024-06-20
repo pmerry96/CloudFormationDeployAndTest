@@ -5,11 +5,11 @@
 },
 {
     "ParameterKey": "PrivateSubnet2CIDR",
-    "ParameterValue": "PRIVATESUBNET2_ANCHOR"
+    "ParameterValue": "PRIVATESUBNET2CIDR_ANCHOR"
 },
 {
     "ParameterKey": "HomeVolumeType",
-    "ParameterValue": "HOMEVOLUMETYPE2_ANCHOR"
+    "ParameterValue": "HOMEVOLUMETYPE_ANCHOR"
 },
 {
     "ParameterKey": "SPSLInstanceNamePrefix",
@@ -65,7 +65,7 @@
 },
 {
     "ParameterKey": "QSS3BucketName",
-    "ParameterValue": "QSS2BUCKETNAME_ANCHOR"
+    "ParameterValue": "QSS3BUCKETNAME_ANCHOR"
 },
 {
     "ParameterKey": "AvailabilityZones",
