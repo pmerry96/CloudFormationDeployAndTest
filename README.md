@@ -1,6 +1,6 @@
 To use, run as follows:
 
-./create_stacks.pl -u <s3 bucket url that points to the main template file> -p <instance root password> -k <key name> [-awdt]
+./create_stacks.pl -u \<s3 bucket url that points to the main template file\> -p \<instance root password\> -k \<key name\> [-awdt]
 
 Arguments:
 
