@@ -29,6 +29,10 @@ if( scalar @availability_zones < 2){
 }
 
 
+# select two random availability zones
+my $num_zones = 2;
+@availability_zones=(shuffle(@availability_zones))[0 .. $num_zones-1];
+
 my @s3details=split(/[.\/]+/, $url);
 
 
@@ -75,9 +79,17 @@ if($filename ne $templatename){
 	exit 1;
 }
 
-
-
 #TODO - make this pick two availability zones that are not always the first two in the list
+my $azstr = "";
+my $counter = 0;
+foreach my $zone (@availability_zones){
+	chomp($zone);
+	$azstr = "$azstr"."$zone";
+
+	# add a delimeter comma unless we are on the last element
+	$azstr = "$azstr"."," unless ($counter++ eq $#availability_zones);
+}
+
 chomp(my $azstr="$availability_zones[0]");
 chomp($azstr="$azstr,$availability_zones[1]");
 
