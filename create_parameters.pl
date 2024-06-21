@@ -29,7 +29,6 @@ if( scalar @availability_zones < 2){
 }
 
 
-# https://pmerry-s3-32619.s3.us-east-2.amazonaws.com/AWS-Templates/templates/sios-protection-suite-main.template.yaml
 my @s3details=split(/[.\/]+/, $url);
 
 
