@@ -2,6 +2,7 @@
 
 use Getopt::Std;
 use File::Glob ':bsd_glob';
+use List::Util qw/shuffle/;
 
 our $opt_r,$opt_p, $opt_k, $opt_u;
 
